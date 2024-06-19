@@ -4,7 +4,7 @@ using BlogEndpoint;
 using UserEndpoint;
 
 var builder = WebApplication.CreateBuilder(args);
-
+    
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
