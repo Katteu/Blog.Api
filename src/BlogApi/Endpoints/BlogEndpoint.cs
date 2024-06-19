@@ -1,8 +1,10 @@
 using BlogModel;
+using UserEndpoints;
 using Microsoft.AspNetCore.Http;
 
-namespace BlogEndpoint;
-public class BlogEP
+
+namespace BlogEndpoints;
+public class BlogEndpoint
 {
 
     public static List<Blog> Posts = new List<Blog>();
@@ -14,7 +16,7 @@ public class BlogEP
 
     public static IResult GetPost(int id)
     {
-        Blog post = Posts.Find(post => post.Id == id);
+        Blog? post = Posts.Find(post => post.Id == id);
 
         if (post is null)
         {
@@ -28,26 +30,26 @@ public class BlogEP
     {
         List<Blog> posts = Posts.FindAll(post => post.AuthorId == id);
 
-        if (posts.Count == 0)
+        if(UserEndpoint.Users.Find(user => user.Id == id) is null)
         {
-            return Results.NotFound("No posts exist under this Author.");
+            return Results.NotFound("Author does not exist.");
         }
 
-        return Results.Ok(posts);
+        return !posts.Any() ? Results.Ok("No posts exist under this Author.") : Results.Ok(posts);
     }
 
     public static Blog CreatePost(Blog post)
     {
-        int currId = Posts.Count == 0 ? 0 : Posts.Max(post => post.Id);
+        int currId = !Posts.Any() ? 0 : Posts.Max(post => post.Id);
         post.Id = currId + 1;
-
+        post.CreatedAt = DateTime.Now;
         Posts.Add(post);
         return post;
     }
 
     public static IResult UpdatePost(Blog updatedPost, int id)
     {
-        Blog post = Posts.Find(post => post.Id == id);
+        Blog? post = Posts.Find(post => post.Id == id);
 
         if (post is null)
         {
@@ -62,7 +64,7 @@ public class BlogEP
 
     public static IResult DeletePost(int id)
     {
-        Blog post = Posts.Find(post => post.Id == id);
+        Blog? post = Posts.Find(post => post.Id == id);
 
         if (post is null)
         {
