@@ -1,11 +1,9 @@
-using BlogModel;
-using BaseEndpoints;
-namespace UserModel;
+namespace Blog.Api.Models;
 
-public class User : IEntity
+public record User
 {
     public int Id { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
 
-}
+}                                                       

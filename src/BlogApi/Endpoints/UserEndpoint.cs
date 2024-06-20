@@ -1,63 +1,96 @@
-using UserModel;
-using BaseEndpoints;
-namespace UserEndpoints;
+using Blog.Api.Data;
+using Blog.Api.Models;
+using Blog.Api.Models.DTO;
 
-// User-specific endpoint that inherits from BaseEndpoint<User>
-public class UserEndpoint : BaseEndpoint<User>
+public static class UserEndpoints
 {
-    // User-specific logic and overrides
-
-    public UserEndpoint() : base()
+    /// <summary>
+    /// Maps User endpoints to the WebApplication.
+    /// </summary>
+    public static void MapUserEndpoints(this WebApplication app)
     {
-    }
+        // Get All Users*
+        app.MapGet("/user", (Database database) =>{
+           return database.Users.Select(u => new UserResponse(u.Id, u.Username));
+        }).WithDisplayName("Get All Users").WithTags("User");
 
-    // Add a new method to retrieve a user by username
-    public IResult GetUserByUsername(string username)
-    {
-        // Find a user with the matching username
-        User? user = _entities.Find(user => user.Username == username);
-        // Return a 404 error if the user is not found
-        return user == null ? Results.NotFound("Username cannot be found") : Results.Ok(user);
-    }
-
-    // Update an existing user
-    public IResult UpdateUser(User updatedUser, int id)
-    {
-        // Get the user to be updated
-        User? user = base.Get(id);
-
-        if (user is null)
+        // Get User by Id*
+        app.MapGet("/user/{id}", (Database database, int id) =>
         {
-            // Return a 404 error if the user to be edited does not exist
-            return Results.NotFound("The user to be edited does not exist.");
-        }
+            var user = database.Users.FirstOrDefault(u => u.Id == id);
 
-        // Check if the updated username is already taken
-        if (_entities.Find(u => u.Username == updatedUser?.Username) is not null)
+            if (user is not null)
+            {
+                return Results.Ok(new UserResponse(user.Id, user.Username));
+            }
+            else
+            {
+                return Results.NotFound("User cannot be found.");
+            }
+        }).WithDisplayName("Get User by Id").WithTags("User");
+
+        // Get User by Username*
+        app.MapGet("/user/username/{username}", (Database database, string username) =>
         {
-            // Return a 409 error if the username is already taken
-            return Results.Conflict("Username is already taken.");
-        }
+            var user = database.Users.FirstOrDefault(u => u.Username == username);
 
-        // Update the user's properties
-        user.Username = updatedUser.Username;
-        user.Password = updatedUser.Password;
+            if (user is not null)
+            {
+                return Results.Ok(new UserResponse(user.Id, user.Username));
+            }
+            else
+            {
+                return Results.NotFound("User cannot be found.");
+            }
+        }).WithDisplayName("Get User by Username").WithTags("User");
 
-        // Return a 200 OK response with the updated user
-        return Results.Ok(user);
-    }
 
-    // Override CreateUser to include validation or additional logic
-    public override IResult Create(User user)
-    {
-        // Check if the username is already taken
-        if (_entities.Find(u => u.Username == user.Username) is not null)
+        // Create User*
+        app.MapPost("/user", (Database database, UserRequest userRequest) =>
         {
-            // Return a 409 error if the username is already taken
-            return Results.Conflict("Username is already taken.");
-        }
+            int currId = !database.Users.Any() ? 0 : database.Users.Max(user => user.Id);
 
-        // Call the base Create method to create the user
-        return base.Create(user);
+            if (database.Users.Any(u => u.Username == userRequest.Username))
+            {
+                return Results.Conflict("Username is already taken.");
+            }
+
+            var user = new User { Id = currId + 1, Username = userRequest.Username, Password = userRequest.Password };
+
+            database.Users.Add(user);
+
+            return Results.Created($"/user/{user.Id}", new UserResponse(user.Id, user.Username));
+        }).WithDisplayName("Create User").WithTags("User");
+
+        // Update User*
+        app.MapPut("/user/{id}", (Database database, UserRequest userRequest, int id) =>
+        {
+            var existingUser = database.Users.FirstOrDefault(u => u.Id == id);
+            if (existingUser is not null)
+            {
+                existingUser.Username = userRequest.Username;
+                existingUser.Password = userRequest.Password;
+                return Results.Ok(new UserResponse(existingUser.Id, existingUser.Username));
+            }
+            else
+            {
+                return Results.NotFound("User does not exist.");
+            }
+        }).WithDisplayName("Update User").WithTags("User");
+
+        // Delete User*
+        app.MapDelete("/user/{id}", (Database database, int id) =>
+        {
+            var user = database.Users.FirstOrDefault(u => u.Id == id);
+            if (user is not null)
+            {
+                database.Users.Remove(user);
+                return Results.Ok();
+            }
+            else
+            {
+                return Results.NotFound("User does not exist.");
+            }
+        }).WithDisplayName("Delete User").WithTags("User");
     }
 }

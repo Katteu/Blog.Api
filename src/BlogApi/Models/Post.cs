@@ -1,7 +1,6 @@
-using BaseEndpoints;
-namespace BlogModel;
+namespace Blog.Api.Models;
 
-public class Blog : IEntity
+public record Post
 {
     public int Id { get; set; }
 
