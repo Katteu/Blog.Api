@@ -17,7 +17,7 @@ public class UserEndpoint : BaseEndpoint<User>
         // Find a user with the matching username
         User? user = _entities.Find(user => user.Username == username);
         // Return a 404 error if the user is not found
-        return user == null ? Results.NotFound() : Results.Ok(user);
+        return user == null ? Results.NotFound("Username cannot be found") : Results.Ok(user);
     }
 
     // Update an existing user
