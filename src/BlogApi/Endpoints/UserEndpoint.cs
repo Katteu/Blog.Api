@@ -48,14 +48,14 @@ public static class UserEndpoints
         // Create User*
         app.MapPost("/user", (Database database, UserRequest userRequest) =>
         {
-            int currId = !database.Users.Any() ? 0 : database.Users.Max(user => user.Id);
+            int currId = database.Users.Count == 0 ? 1 : database.Users.Max(user => user.Id) + 1;
 
             if (database.Users.Any(u => u.Username == userRequest.Username))
             {
                 return Results.Conflict("Username is already taken.");
             }
 
-            var user = new User { Id = currId + 1, Username = userRequest.Username, Password = userRequest.Password };
+            var user = new User { Id = currId, Username = userRequest.Username, Password = userRequest.Password };
 
             database.Users.Add(user);
 

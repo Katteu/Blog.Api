@@ -49,7 +49,7 @@ public static class PostEndpoints
         // Create a new post*
         app.MapPost("/post", (Database database, PostRequest postRequest) =>
         {
-            int currId = !database.Users.Any() ? 0 : database.Users.Max(user => user.Id);
+            int currId = database.Posts.Count == 0 ? 0 : database.Posts.Max(post => post.Id);
             Post post = new Post { Id = currId + 1, Title = postRequest.Title, Content = postRequest.Content, AuthorId = postRequest.AuthorId, CreatedAt = DateTime.Now };
             database.Posts.Add(post);
             return Results.Created($"/post/{post.Id}", new PostResponse(post.Id, post.Title, post.Content, post.CreatedAt, post.AuthorId));
