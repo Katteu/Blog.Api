@@ -34,7 +34,7 @@ app.MapGet("/user", () => userEndpoint.GetAll());
 // Get a user by Id
 app.MapGet("/user/{id}", (int id) => userEndpoint.Get(id));
 // Get a user by username
-app.MapGet("/user/username/{id}", (string username) => userEndpoint.GetUserByUsername(username));
+app.MapGet("/user/username/{username}", (string username) => userEndpoint.GetUserByUsername(username));
 // Create a new user
 app.MapPost("/user", (User user) => userEndpoint.Create(user));
 // Update an existing user
