@@ -1,6 +1,7 @@
-
+using BaseEndpoints;
 namespace BlogModel;
-public class Blog
+
+public class Blog : IEntity
 {
     public int Id { get; set; }
 

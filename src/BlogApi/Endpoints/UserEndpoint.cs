@@ -1,73 +1,49 @@
 using UserModel;
-
+using BaseEndpoints;
 namespace UserEndpoints;
-public class UserEndpoint
+
+public class UserEndpoint : BaseEndpoint<User>
 {
+    // User-specific logic and overrides
 
-    public static List<User> Users = new List<User>();
-
-    public static List<User> GetAllUsers()
+    public UserEndpoint() : base()
     {
-        return Users;
     }
 
-    public static IResult GetUser(int id)
+    // Add a new method to retrieve a user by username
+    public IResult GetUserByUsername(string username)
     {
-        User? user = Users.Find(user => user.Id == id);
-
-        if (user is null)
-        {
-            return Results.NotFound("User specified does not exist.");
-        }
-
-        return Results.Ok(user);
+        User? user = _entities.Find(user => user.Username == username);
+        return user == null ? Results.NotFound() : Results.Ok(user);
     }
-
-    public static IResult CreateUser(User user)
+    public IResult UpdateUser(User updatedUser, int id)
     {
-        int currId = !Users.Any() ? 0 : Users.Max(user => user.Id);
-        user.Id = currId + 1;
+        User? user = base.Get(id);
 
-        if (Users.Find(u => u.Username == user.Username) is not null)
+        if(user is null)
         {
-            return Results.Conflict("Username is already taken.");
+            return Results.NotFound("The user to be edited does not exist.");
         }
 
-        Users.Add(user);
-        return Results.Ok(user);
-    }
-
-    public static IResult UpdateUser(User updatedUser, int id)
-    {
-        User? user = Users.Find(user => user.Id == id);
-
-        if (user is null)
-        {
-            return Results.NotFound("User to be updated does not exist.");
-        }
-
-        if (Users.Find(u => u.Username == user?.Username) is not null)
+        if (_entities.Find(u => u.Username == updatedUser?.Username) is not null)
         {
             return Results.Conflict("Username is already taken.");
         }
 
         user.Username = updatedUser.Username;
-        user.Password = updatedUser.Username;
+        user.Password = updatedUser.Password;
 
         return Results.Ok(user);
     }
 
-    public static IResult DeleteUser(int id)
+    // Override CreateUser to include validation or additional logic
+    public override IResult Create(User user)
     {
-        User? user = Users.Find(user => user.Id == id);
-
-        if (user is null)
+        if (_entities.Find(u => u.Username == user.Username) is not null)
         {
-            return Results.NotFound("User to be removed does not exist.");
+            return Results.Conflict("Username is already taken.");
         }
 
-        Users.Remove(user);
-        return Results.Ok(user);
+        return base.Create(user);
     }
-
 }
