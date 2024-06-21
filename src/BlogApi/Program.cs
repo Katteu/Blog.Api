@@ -1,5 +1,8 @@
 using Blog.Api.Data;
+using Blog.Api.Services;
+using Blog.Api.Endpoints;
 using Microsoft.OpenApi.Models;
+using Blog.Api.Models;
 
 // Create a new WebApplicationBuilder instance
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +14,11 @@ builder.Services.AddSwaggerGen(options =>{
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Blog.API", Version = "v1" });
 });
 
-builder.Services.AddSingleton<Database>();
+builder.Services.AddSingleton<Database<Post>>();
+builder.Services.AddSingleton<Database<User>>();
+builder.Services.AddScoped<PostServices>();
+builder.Services.AddScoped<UserServices>();
+
 
 // Build the WebApplication instance
 var app = builder.Build();
@@ -26,8 +33,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapUserEndpoints();
-app.MapPostEndpoints();
+app.RegisterEndpointModules();
 
 
 app.Run();

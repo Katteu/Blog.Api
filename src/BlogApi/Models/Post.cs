@@ -1,6 +1,8 @@
+using Blog.Api.Services;
+
 namespace Blog.Api.Models;
 
-public record Post
+public record Post : IEntity
 {
     public int Id { get; set; }
 

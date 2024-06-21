@@ -2,7 +2,6 @@ namespace Blog.Api.Models.DTO;
 
 // Used when creating or updating a user
 public record class UserRequest(
-    int Id,
     string Username,
     string Password
 );
