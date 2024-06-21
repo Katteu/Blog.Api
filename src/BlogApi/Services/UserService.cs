@@ -4,7 +4,7 @@ using Blog.Api.Models.DTO;
 
 namespace Blog.Api.Services;
 
-public class UserServices : BaseService<User,UserRequest,UserResponse>
+public class UserServices : BaseService<User, UserRequest, UserResponse>
 {
     public UserServices(Database<User> database) : base(database)
     {
@@ -19,7 +19,8 @@ public class UserServices : BaseService<User,UserRequest,UserResponse>
         return base.Create(request);
     }
 
-    public IResult Update(UserRequest request, int id){
+    public IResult Update(UserRequest request, int id)
+    {
         var existingUser = _database.Data.FirstOrDefault(u => u.Id == id);
 
         if (_database.Data.Any(u => u.Username == request.Username))
@@ -38,7 +39,8 @@ public class UserServices : BaseService<User,UserRequest,UserResponse>
         return Results.Ok(new UserResponse(existingUser.Id, existingUser.Username));
     }
 
-    public IResult GetByUsername(string username){
+    public IResult GetByUsername(string username)
+    {
         var user = _database.Data.FirstOrDefault(u => u.Username == username);
 
         if (user is not null)

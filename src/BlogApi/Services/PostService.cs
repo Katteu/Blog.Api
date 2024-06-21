@@ -4,13 +4,14 @@ using Blog.Api.Models.DTO;
 
 namespace Blog.Api.Services;
 
-public class PostServices : BaseService<Post,PostRequest,PostResponse>
+public class PostServices : BaseService<Post, PostRequest, PostResponse>
 {
     public PostServices(Database<Post> database) : base(database)
     {
     }
-    
-    public IResult Update(PostRequest request, int id){
+
+    public IResult Update(PostRequest request, int id)
+    {
         var existingPost = _database.Data.FirstOrDefault(p => p.Id == id);
         if (existingPost is not null)
         {
@@ -19,12 +20,14 @@ public class PostServices : BaseService<Post,PostRequest,PostResponse>
             existingPost.AuthorId = request.AuthorId;
             return Results.Ok(new PostResponse(existingPost.Id, existingPost.Title, existingPost.Content, existingPost.CreatedAt, existingPost.AuthorId));
         }
-        else{
+        else
+        {
             return Results.NotFound("Post not found.");
         }
     }
 
-    public IResult GetPostsByAuthor(int authorId){
+    public IResult GetPostsByAuthor(int authorId)
+    {
         IEnumerable<PostResponse> posts = _database.Data
                 .Where(p => p.AuthorId == authorId)
                 .Select(p => new PostResponse(p.Id, p.Title, p.Content, p.CreatedAt, p.AuthorId))
@@ -40,7 +43,7 @@ public class PostServices : BaseService<Post,PostRequest,PostResponse>
 
     protected override Post MapToModel(PostRequest request, Post? existingModel = default)
     {
-        return existingModel ?? new Post { Title = request.Title, Content = request.Content, AuthorId = request.AuthorId,  CreatedAt = DateTime.Now };
+        return existingModel ?? new Post { Title = request.Title, Content = request.Content, AuthorId = request.AuthorId, CreatedAt = DateTime.Now };
     }
 }
 

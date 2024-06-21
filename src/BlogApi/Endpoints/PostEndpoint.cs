@@ -16,9 +16,9 @@ public class PostEndpoint : IEndpointModule
 
         group.MapGet("/", (PostServices postService) => postService.GetAll());
         group.MapGet("/{id}", (PostServices postService, int id) => postService.GetById(id));
-        group.MapGet("/author/{authorId}",(PostServices postService, int authorId) => postService.GetPostsByAuthor(authorId));
+        group.MapGet("/author/{authorId}", (PostServices postService, int authorId) => postService.GetPostsByAuthor(authorId));
         group.MapPost("/", (PostServices postService, PostRequest postRequest) => postService.Create(postRequest));
-        group.MapPut("/{id}", (PostServices postService, PostRequest postRequest, int id) => postService.Update(postRequest,id));
-        group.MapDelete("/{id}", (PostServices postService,int id) => postService.Delete(id));
+        group.MapPut("/{id}", (PostServices postService, PostRequest postRequest, int id) => postService.Update(postRequest, id));
+        group.MapDelete("/{id}", (PostServices postService, int id) => postService.Delete(id));
     }
 }
